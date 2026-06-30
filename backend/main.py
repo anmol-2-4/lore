@@ -10,7 +10,9 @@ from pydantic import BaseModel
 
 from backend import memory
 
-FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
+ROOT = Path(__file__).resolve().parent.parent
+FRONTEND = ROOT / "frontend"
+GRAPH_FILE = ROOT / "data" / "graph.html"
 app = FastAPI(title="Wingman")
 
 
@@ -20,30 +22,43 @@ class Fragment(BaseModel):
 
 class Query(BaseModel):
     text: str
+    mode: str = "ask"
 
 
-@app.post("/api/remember")
-async def remember(frag: Fragment):
-    await memory.remember(frag.text)
-    return {"ok": True, "stored": frag.text}
+@app.post("/api/fragment")
+async def fragment(frag: Fragment):
+    await memory.add_fragment(frag.text)
+    return {"ok": True}
+
+
+@app.post("/api/reconstruct")
+async def reconstruct():
+    await memory.reconstruct()
+    return {"ok": True}
+
+
+@app.post("/api/enrich")
+async def enrich():
+    await memory.enrich()
+    return {"ok": True}
 
 
 @app.post("/api/recall")
 async def recall(q: Query):
-    answers = await memory.recall(q.text)
-    return {"query": q.text, "answers": answers}
-
-
-@app.post("/api/improve")
-async def improve():
-    await memory.improve()
-    return {"ok": True}
+    answers = await memory.recall(q.text, q.mode)
+    return {"answers": answers}
 
 
 @app.post("/api/forget")
 async def forget():
     await memory.forget()
     return {"ok": True}
+
+
+@app.get("/api/graph")
+async def graph():
+    await memory.graph_html(str(GRAPH_FILE))
+    return FileResponse(GRAPH_FILE)
 
 
 app.mount("/static", StaticFiles(directory=FRONTEND), name="static")

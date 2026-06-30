@@ -15,7 +15,8 @@ FRAGMENTS = [
 async def main():
     await memory.forget()
     for f in FRAGMENTS:
-        await memory.remember(f)
+        await memory.add_fragment(f)
+    await memory.reconstruct()
     for q in ["What happened last night?", "Who is Sarah?", "Where is my jacket?"]:
         print(f"\n> {q}")
         for answer in await memory.recall(q):

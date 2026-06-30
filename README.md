@@ -11,15 +11,19 @@ Built for the [WeMakeDevs × Cognee hackathon](https://www.wemakedevs.org/hackat
 (Jun 29 – Jul 5, 2026), **Best Use of Open Source** track. Runs **100% local, $0** —
 self-hosted Cognee + Ollama, no OpenAI key required.
 
-## Cognee's memory lifecycle → Wingman features
-| Verb | In Wingman |
-|------|-----------|
-| `remember()` | Drop a fragment → added to the memory graph |
-| `recall()`   | Interrogate the night |
-| `improve()`  | "Connect the dots" → cross-link fragments for relational answers |
-| `forget()`   | "Erase the night" |
+## How it uses Cognee (not just a wrapper)
+Wingman drops to Cognee's primitives to build a real, structured, temporal memory graph:
 
-All four go through `backend/memory.py`, so the backend is swappable.
+| Step | Cognee | In Wingman |
+|------|--------|-----------|
+| Ingest | `add()` | Drop each fragment in |
+| Reconstruct | `cognify(temporal_cognify=True)` | Build a typed, time-ordered knowledge graph of the night |
+| Enrich | `memify()` | "Connect the dots" — cross-link entities across fragments |
+| Interrogate | `search(GRAPH_COMPLETION / GRAPH_COMPLETION_COT / TEMPORAL)` | Graph-traversal answers + timeline reconstruction |
+| Visualize | `visualize_graph()` | Live interactive view of the reconstructed memory |
+| Erase | `forget()` | "Erase the night" |
+
+Everything goes through `backend/memory.py`, so the backend is swappable for the Cloud track.
 
 ## Quickstart (local, no OpenAI)
 ```bash

@@ -14,20 +14,37 @@
 
   <main>
     <section class="panel">
-      <h2>Drop a fragment</h2>
+      <h2>1 · Drop the fragments</h2>
       <textarea id="fragment" placeholder="A receipt, a blurry photo caption, a half-remembered name..."></textarea>
       <div class="row">
-        <button id="rememberBtn">Remember</button>
-        <button id="improveBtn" class="ghost">Connect the dots</button>
-        <button id="forgetBtn" class="danger">Erase the night</button>
+        <button id="addBtn">Add fragment</button>
+        <button id="seedBtn" class="ghost">Load demo night</button>
       </div>
       <ul id="log"></ul>
     </section>
 
     <section class="panel">
-      <h2>Interrogate</h2>
+      <h2>2 · Rebuild the memory</h2>
+      <div class="row">
+        <button id="reconstructBtn">Reconstruct the night</button>
+        <button id="enrichBtn" class="ghost">Connect the dots</button>
+      </div>
+      <div class="row">
+        <button id="graphBtn" class="ghost">View memory graph</button>
+        <button id="forgetBtn" class="danger">Erase the night</button>
+      </div>
+      <p id="state" class="state"></p>
+    </section>
+
+    <section class="panel wide">
+      <h2>3 · Interrogate</h2>
       <div class="row">
         <input id="query" placeholder="What happened last night?" />
+        <select id="mode">
+          <option value="ask">Ask</option>
+          <option value="reason">Reason</option>
+          <option value="timeline">Timeline</option>
+        </select>
         <button id="recallBtn">Ask</button>
       </div>
       <div id="answers"></div>
