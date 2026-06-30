@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wingman — Where's My Context?</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🎲 Wingman</h1>
+    <p class="tag">You woke up in Vegas with no memory of last night. Let's reconstruct it.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Drop a fragment</h2>
+      <textarea id="fragment" placeholder="A receipt, a blurry photo caption, a half-remembered name..."></textarea>
+      <div class="row">
+        <button id="rememberBtn">Remember</button>
+        <button id="improveBtn" class="ghost">Connect the dots</button>
+        <button id="forgetBtn" class="danger">Erase the night</button>
+      </div>
+      <ul id="log"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Interrogate</h2>
+      <div class="row">
+        <input id="query" placeholder="What happened last night?" />
+        <button id="recallBtn">Ask</button>
+      </div>
+      <div id="answers"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
