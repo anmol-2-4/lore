@@ -1,3 +1,5 @@
+import os
+
 import cognee
 from cognee.modules.search.types.SearchType import SearchType
 
@@ -8,12 +10,16 @@ SEARCH_MODES = {
 }
 
 
+def _temporal_enabled():
+    return os.getenv("WINGMAN_TEMPORAL", "false").lower() in ("1", "true", "yes")
+
+
 async def add_fragment(text):
     return await cognee.add(text)
 
 
 async def reconstruct():
-    return await cognee.cognify(temporal_cognify=True)
+    return await cognee.cognify(temporal_cognify=_temporal_enabled())
 
 
 async def enrich():
