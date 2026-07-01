@@ -80,7 +80,7 @@ $("recallBtn").onclick = async () => {
   const text = $("query").value.trim();
   if (!text) return;
   $("answers").innerHTML = "<em>thinking...</em>";
-  try { const data = await post("/api/recall", { text, mode: $("mode").value }); render(data.answers, "ans"); }
+  try { const data = await post("/api/recall", { text }); render(data.answers, "ans"); }
   catch (e) { $("answers").innerHTML = "error: " + e.message; }
 };
 

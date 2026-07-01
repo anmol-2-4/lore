@@ -36,7 +36,7 @@ Every memory operation goes through Cognee's named lifecycle APIs:
 | Wingman action | Cognee API | What it does |
 |---|---|---|
 | Commit fragments to memory | **`remember()`** | ingest + build the graph-vector memory |
-| Interrogate the night | **`recall()`** | graph-grounded answers (Ask / Reason / Timeline) |
+| Interrogate the night | **`recall()`** | graph-grounded answers via graph traversal |
 | Connect the dots | **`improve()`** | enrich / cross-link memories |
 | Erase the night | **`forget()`** | wipe all memory |
 | Spot contradictions | **`recall(only_context=True)`** | pull the full memory, then reason over it |
