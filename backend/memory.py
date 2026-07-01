@@ -14,6 +14,13 @@ def _temporal_enabled():
     return os.getenv("WINGMAN_TEMPORAL", "false").lower() in ("1", "true", "yes")
 
 
+def _answers(result):
+    data = result.get("search_result") if isinstance(result, dict) else getattr(result, "search_result", result)
+    if isinstance(data, (list, tuple)):
+        return [str(x) for x in data]
+    return [str(data)]
+
+
 async def add_fragment(text):
     return await cognee.add(text)
 
@@ -31,8 +38,7 @@ async def recall(query, mode="ask"):
     results = await cognee.search(query_text=query, query_type=query_type)
     answers = []
     for r in results:
-        value = getattr(r, "search_result", r)
-        answers.append(value if isinstance(value, str) else str(value))
+        answers.extend(_answers(r))
     return answers
 
 
@@ -41,4 +47,4 @@ async def forget():
 
 
 async def graph_html(path):
-    return await cognee.visualize_graph(destination_file_path=path)
+    return await cognee.visualize_graph(destination_file_path=os.path.abspath(path))
