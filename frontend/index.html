@@ -7,54 +7,50 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <header>
-    <div class="kicker">Memory reconstruction · built on Cognee</div>
-    <h1>Wingman</h1>
-    <p class="tag">You woke up in Vegas with no memory of last night. Feed it the fragments; it rebuilds the story.</p>
+  <header class="casebar">
+    <div class="filetag">CASE FILE · WNGMN-04B · built on Cognee</div>
+    <h1>Where's my context?</h1>
+    <p class="status"><span class="dot"></span><span id="statusText">A night in Vegas. No memory. Reconstruct it from the evidence.</span></p>
   </header>
 
-  <main>
-    <section class="panel">
-      <h2><span class="step">01</span> Drop the fragments</h2>
-      <textarea id="fragment" placeholder="A receipt. A blurry photo caption. A half-remembered name..."></textarea>
+  <main class="board">
+    <section class="col evidence">
+      <div class="colhead">Evidence <span id="evCount" class="count">0</span></div>
+      <textarea id="fragment" placeholder="a receipt · a blurry photo · a half-remembered name"></textarea>
       <div class="row">
-        <button id="addBtn">Add fragment</button>
-        <button id="seedBtn" class="ghost">Load demo night</button>
+        <button id="addBtn">Log it</button>
+        <button id="seedBtn" class="ghost">Load the night</button>
       </div>
-      <ul id="log"></ul>
-    </section>
-
-    <section class="panel">
-      <h2><span class="step">02</span> Commit to memory</h2>
-      <div class="row">
-        <button id="reconstructBtn">Remember the night</button>
+      <div id="cards" class="cards"><p class="hint" id="emptyEv">Nothing logged yet.</p></div>
+      <div class="row actions">
+        <button id="reconstructBtn">Reconstruct</button>
         <button id="enrichBtn" class="ghost">Connect the dots</button>
       </div>
       <div class="row">
-        <button id="graphBtn" class="ghost">View memory graph</button>
-        <button id="forgetBtn" class="danger">Erase the night</button>
+        <button id="graphBtn" class="ghost">Connection board</button>
+        <button id="forgetBtn" class="danger">Close case</button>
       </div>
       <p id="state" class="state"></p>
     </section>
 
-    <section class="panel wide">
-      <h2><span class="step">03</span> Interrogate the memory</h2>
-      <div class="row">
-        <input id="query" placeholder="What happened last night?" />
+    <section class="col story">
+      <div class="colhead">The story</div>
+      <p class="hint lead" id="storyHint">Reconstruct the night, then interrogate the memory below.</p>
+      <div class="askbar">
+        <span class="prompt">ask&gt;</span>
+        <input id="query" placeholder="what happened last night?" />
         <button id="recallBtn">Ask</button>
-        <button id="contraBtn" class="ghost">Spot contradictions</button>
+        <button id="contraBtn" class="ghost">Find conflicts</button>
       </div>
       <div id="answers"></div>
     </section>
 
-    <section class="panel wide" id="graphPanel" hidden>
-      <h2><span class="step">04</span> Memory graph <span class="muted">— what Cognee actually remembers</span></h2>
+    <section class="col wide" id="graphPanel" hidden>
+      <div class="colhead">Connection board <span class="muted">— what Cognee remembers</span></div>
       <p id="graphLoading" class="state"></p>
-      <iframe id="graphFrame" title="Cognee memory graph"></iframe>
+      <iframe id="graphFrame" title="memory graph"></iframe>
     </section>
   </main>
-
-  <footer>Self-hosted Cognee · local models · no API keys</footer>
 
   <script src="/static/app.js"></script>
 </body>

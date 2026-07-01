@@ -1,9 +1,5 @@
 const $ = (id) => document.getElementById(id);
-const log = (msg) => {
-  const li = document.createElement("li");
-  li.textContent = msg;
-  $("log").prepend(li);
-};
+const setStatus = (msg) => { $("statusText").textContent = msg; };
 
 const DEMO = [
   "Around 9pm I was at the Bellagio bar with someone named Sarah.",
@@ -15,6 +11,8 @@ const DEMO = [
   "I'm now pretty sure I left my jacket in the back of the taxi, not at the pool.",
 ];
 
+const evidence = [];
+
 async function post(path, body) {
   const res = await fetch(path, {
     method: "POST",
@@ -25,30 +23,51 @@ async function post(path, body) {
   return res.json();
 }
 
-// live "spinner + elapsed seconds" feedback; returns a stop() fn
 function busy(el, label, { center } = {}) {
   const start = Date.now();
-  el.innerHTML =
-    `<div class="${center ? "center" : ""}"><span class="spinner"></span> ` +
-    `${label} <span class="elapsed">0s</span></div>`;
+  el.innerHTML = `<div class="${center ? "center" : ""}"><span class="spinner"></span> ${label} <span class="elapsed">0s</span></div>`;
   const span = el.querySelector(".elapsed");
-  const id = setInterval(() => {
-    span.textContent = Math.round((Date.now() - start) / 1000) + "s";
-  }, 1000);
+  const id = setInterval(() => { span.textContent = Math.round((Date.now() - start) / 1000) + "s"; }, 1000);
   return () => clearInterval(id);
 }
 
-function render(items, cls) {
-  $("answers").innerHTML = "";
+function addCard(text) {
+  const empty = $("emptyEv");
+  if (empty) empty.remove();
+  evidence.push(text);
+  const n = evidence.length;
+  const card = document.createElement("div");
+  card.className = "card";
+  card.style.setProperty("--rot", (n % 2 ? "-0.8deg" : "0.9deg"));
+  const tag = document.createElement("div");
+  tag.className = "etag";
+  tag.textContent = "EXHIBIT " + String(n).padStart(2, "0");
+  const body = document.createElement("div");
+  body.className = "ebody";
+  body.textContent = text;
+  card.append(tag, body);
+  $("cards").appendChild(card);
+  $("evCount").textContent = n;
+}
+
+function findings(items, cls, query) {
+  const box = $("answers");
+  box.innerHTML = "";
+  if (query) {
+    const q = document.createElement("div");
+    q.className = "qlabel";
+    q.textContent = "ask> " + query;
+    box.appendChild(q);
+  }
   if (!items || !items.length) {
-    $("answers").innerHTML = '<div class="center">...nothing.</div>';
+    box.insertAdjacentHTML("beforeend", '<div class="center">...the memory draws a blank.</div>');
     return;
   }
   for (const a of items) {
     const div = document.createElement("div");
     div.className = cls;
     div.textContent = a;
-    $("answers").appendChild(div);
+    box.appendChild(div);
   }
 }
 
@@ -56,67 +75,61 @@ $("addBtn").onclick = async () => {
   const text = $("fragment").value.trim();
   if (!text) return;
   $("addBtn").disabled = true;
-  try {
-    const r = await post("/api/fragment", { text });
-    log("staged: " + text);
-    $("state").textContent = `${r.staged} fragment(s) staged — hit "Remember the night".`;
-    $("fragment").value = "";
-  } catch (e) { log("error: " + e.message); }
+  try { await post("/api/fragment", { text }); addCard(text); $("fragment").value = ""; setStatus(`${evidence.length} pieces of evidence logged.`); }
+  catch (e) { setStatus("error: " + e.message); }
   $("addBtn").disabled = false;
 };
 
 $("seedBtn").onclick = async () => {
   $("seedBtn").disabled = true;
-  let n = 0;
-  for (const f of DEMO) {
-    try { await post("/api/fragment", { text: f }); log("staged: " + f); n++; }
-    catch (e) { log("error: " + e.message); }
-  }
-  $("state").textContent = `${n} fragments staged — hit "Remember the night".`;
+  for (const f of DEMO) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
+  setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
   $("seedBtn").disabled = false;
 };
 
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;
-  const stop = busy($("state"), "Building the memory graph (running the local LLM)…");
-  try { await post("/api/reconstruct"); $("state").textContent = "Committed to memory. Ask away, spot contradictions, or view the graph."; }
-  catch (e) { $("state").textContent = "error: " + e.message; }
-  finally { stop(); $("reconstructBtn").disabled = false; }
+  const stop = busy($("state"), "Reconstructing the night into memory…");
+  try { await post("/api/reconstruct"); setStatus("Memory reconstructed. Interrogate it, or open the connection board."); $("storyHint").textContent = "Memory built. Ask it anything below."; }
+  catch (e) { setStatus("error: " + e.message); }
+  finally { stop(); $("state").textContent = ""; $("reconstructBtn").disabled = false; }
 };
 
 $("enrichBtn").onclick = async () => {
   $("enrichBtn").disabled = true;
-  const stop = busy($("state"), "Connecting the dots across memories…");
-  try { await post("/api/improve"); $("state").textContent = "Memory enriched."; }
-  catch (e) { $("state").textContent = "error: " + e.message; }
-  finally { stop(); $("enrichBtn").disabled = false; }
+  const stop = busy($("state"), "Connecting the dots…");
+  try { await post("/api/improve"); }
+  catch (e) {}
+  finally { stop(); $("state").textContent = "Connections enriched."; $("enrichBtn").disabled = false; }
 };
 
 $("forgetBtn").onclick = async () => {
-  if (!confirm("Erase everything?")) return;
+  if (!confirm("Close the case and erase all memory?")) return;
   try {
     await post("/api/forget");
-    $("state").textContent = "The night is gone.";
-    $("answers").innerHTML = ""; $("log").innerHTML = "";
+    evidence.length = 0;
+    $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+    $("answers").innerHTML = ""; $("evCount").textContent = "0";
     $("graphPanel").hidden = true;
-  } catch (e) { $("state").textContent = "error: " + e.message; }
+    setStatus("Case closed. Memory erased.");
+  } catch (e) { setStatus("error: " + e.message); }
 };
 
 $("recallBtn").onclick = async () => {
   const text = $("query").value.trim();
   if (!text) return;
   $("recallBtn").disabled = true;
-  const stop = busy($("answers"), "Searching the memory graph…", { center: true });
-  try { const data = await post("/api/recall", { text }); stop(); render(data.answers, "ans"); }
-  catch (e) { stop(); $("answers").innerHTML = '<div class="center">error: ' + e.message + "</div>"; }
+  const stop = busy($("answers"), "Searching the memory…", { center: true });
+  try { const d = await post("/api/recall", { text }); stop(); findings(d.answers, "finding", text); }
+  catch (e) { stop(); findings(["error: " + e.message], "finding"); }
   finally { $("recallBtn").disabled = false; }
 };
 
 $("contraBtn").onclick = async () => {
   $("contraBtn").disabled = true;
-  const stop = busy($("answers"), "Cross-checking memories for conflicts…", { center: true });
-  try { const data = await post("/api/contradictions"); stop(); render(data.conflicts, "ans conflict"); }
-  catch (e) { stop(); $("answers").innerHTML = '<div class="center">error: ' + e.message + "</div>"; }
+  const stop = busy($("answers"), "Cross-checking for conflicting statements…", { center: true });
+  try { const d = await post("/api/contradictions"); stop(); findings(d.conflicts, "finding conflict"); }
+  catch (e) { stop(); findings(["error: " + e.message], "finding"); }
   finally { $("contraBtn").disabled = false; }
 };
 
@@ -124,7 +137,7 @@ $("graphBtn").onclick = () => {
   const panel = $("graphPanel");
   panel.hidden = false;
   panel.scrollIntoView({ behavior: "smooth" });
-  const stop = busy($("graphLoading"), "Rendering the memory graph…");
+  const stop = busy($("graphLoading"), "Laying out the connection board…");
   const frame = $("graphFrame");
   frame.onload = () => { stop(); $("graphLoading").textContent = ""; };
   frame.src = "/api/graph?t=" + Date.now();
