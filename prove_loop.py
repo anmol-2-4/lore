@@ -14,13 +14,11 @@ FRAGMENTS = [
 
 async def main():
     await memory.forget()
-    for f in FRAGMENTS:
-        await memory.add_fragment(f)
-    await memory.reconstruct()
+    await memory.remember(FRAGMENTS)
     for q in ["What happened last night?", "Who is Sarah?", "Where is my jacket?"]:
         print(f"\n> {q}")
         for answer in await memory.recall(q):
-            print("  -", answer)
+            print("  " + answer)
 
 
 if __name__ == "__main__":

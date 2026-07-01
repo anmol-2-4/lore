@@ -8,12 +8,14 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend import memory
+from backend import analysis, memory
 
 ROOT = Path(__file__).resolve().parent.parent
 FRONTEND = ROOT / "frontend"
 GRAPH_FILE = ROOT / "data" / "graph.html"
 app = FastAPI(title="Wingman")
+
+_staged: list[str] = []
 
 
 class Fragment(BaseModel):
@@ -27,30 +29,37 @@ class Query(BaseModel):
 
 @app.post("/api/fragment")
 async def fragment(frag: Fragment):
-    await memory.add_fragment(frag.text)
-    return {"ok": True}
+    _staged.append(frag.text)
+    return {"ok": True, "staged": len(_staged)}
 
 
 @app.post("/api/reconstruct")
 async def reconstruct():
-    await memory.reconstruct()
-    return {"ok": True}
-
-
-@app.post("/api/enrich")
-async def enrich():
-    await memory.enrich()
+    if _staged:
+        await memory.remember(list(_staged))
+        _staged.clear()
     return {"ok": True}
 
 
 @app.post("/api/recall")
 async def recall(q: Query):
-    answers = await memory.recall(q.text, q.mode)
-    return {"answers": answers}
+    return {"answers": await memory.recall(q.text, q.mode)}
+
+
+@app.post("/api/contradictions")
+async def contradictions():
+    return {"conflicts": await analysis.find_contradictions()}
+
+
+@app.post("/api/improve")
+async def improve():
+    await memory.improve()
+    return {"ok": True}
 
 
 @app.post("/api/forget")
 async def forget():
+    _staged.clear()
     await memory.forget()
     return {"ok": True}
 

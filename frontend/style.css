@@ -21,3 +21,4 @@ button:disabled { opacity:.5; cursor:wait; }
 #log li { padding:.25rem 0; border-bottom:1px solid #1f1f2c; }
 #answers .ans { background:#0e0e18; border-left:3px solid var(--neon2); padding:.7rem .9rem; margin:.5rem 0; border-radius:6px; white-space:pre-wrap; }
 @media (max-width:760px){ main{ grid-template-columns:1fr; } }
+#answers .conflict { border-left-color: #ff2e88; }
