@@ -2,12 +2,17 @@ import os
 
 import cognee
 from cognee.modules.search.types.SearchType import SearchType
+from cognee.infrastructure.databases.graph import get_graph_engine
 
 SEARCH_MODES = {
     "ask": SearchType.GRAPH_COMPLETION,
     "reason": SearchType.GRAPH_COMPLETION_COT,
     "timeline": SearchType.TEMPORAL,
 }
+
+
+def _temporal_enabled():
+    return os.getenv("WINGMAN_TEMPORAL", "false").lower() in ("1", "true", "yes")
 
 
 def _text(entry):
@@ -40,3 +45,10 @@ async def forget():
 
 async def graph_html(path):
     return await cognee.visualize_graph(destination_file_path=os.path.abspath(path))
+
+
+async def graph_stats():
+    engine = await get_graph_engine()
+    await engine.get_graph_data()          # warmup: force lazy-loaded graph to connect
+    nodes, edges = await engine.get_graph_data()
+    return {"nodes": len(nodes), "edges": len(edges)}

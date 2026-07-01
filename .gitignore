@@ -11,3 +11,5 @@ cognee/
 
 # generated Cognee graph visualization (regenerated at runtime)
 data/graph.html
+
+data/.memory

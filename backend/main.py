@@ -13,6 +13,7 @@ from backend import analysis, memory
 ROOT = Path(__file__).resolve().parent.parent
 FRONTEND = ROOT / "frontend"
 GRAPH_FILE = ROOT / "data" / "graph.html"
+MARKER = ROOT / "data" / ".memory"   # reliable "memory exists" flag (cold-safe)
 app = FastAPI(title="Wingman")
 
 _staged: list[str] = []
@@ -27,6 +28,11 @@ class Query(BaseModel):
     mode: str = "ask"
 
 
+@app.get("/api/status")
+async def status():
+    return {"has_memory": MARKER.exists()}
+
+
 @app.post("/api/fragment")
 async def fragment(frag: Fragment):
     _staged.append(frag.text)
@@ -38,7 +44,8 @@ async def reconstruct():
     if _staged:
         await memory.remember(list(_staged))
         _staged.clear()
-    return {"ok": True}
+        MARKER.write_text("1")
+    return {"ok": True, **await memory.graph_stats()}
 
 
 @app.post("/api/recall")
@@ -54,13 +61,14 @@ async def contradictions():
 @app.post("/api/improve")
 async def improve():
     await memory.improve()
-    return {"ok": True}
+    return await memory.graph_stats()
 
 
 @app.post("/api/forget")
 async def forget():
     _staged.clear()
     await memory.forget()
+    MARKER.unlink(missing_ok=True)
     return {"ok": True}
 
 

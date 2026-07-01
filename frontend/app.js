@@ -12,6 +12,7 @@ const DEMO = [
 ];
 
 const evidence = [];
+let hasMemory = false;
 
 async function post(path, body) {
   const res = await fetch(path, {
@@ -71,6 +72,15 @@ function findings(items, cls, query) {
   }
 }
 
+// on load: is there already memory (persisted from a previous session)?
+(async function init() {
+  try {
+    const s = await (await fetch("/api/status")).json();
+    hasMemory = s.has_memory;
+    if (hasMemory) $("storyHint").textContent = "Memory on file. Ask it anything below.";
+  } catch (e) {}
+})();
+
 $("addBtn").onclick = async () => {
   const text = $("fragment").value.trim();
   if (!text) return;
@@ -90,27 +100,36 @@ $("seedBtn").onclick = async () => {
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;
   const stop = busy($("state"), "Reconstructing the night into memory…");
-  try { await post("/api/reconstruct"); setStatus("Memory reconstructed. Interrogate it, or open the connection board."); $("storyHint").textContent = "Memory built. Ask it anything below."; }
-  catch (e) { setStatus("error: " + e.message); }
+  try {
+    const d = await post("/api/reconstruct");
+    hasMemory = true;
+    setStatus("Memory reconstructed. Interrogate it, or open the connection board.");
+    $("storyHint").textContent = `Memory built — ${d.nodes || ""} facts. Ask it anything below.`;
+  } catch (e) { setStatus("error: " + e.message); }
   finally { stop(); $("state").textContent = ""; $("reconstructBtn").disabled = false; }
 };
 
 $("enrichBtn").onclick = async () => {
+  if (!hasMemory) { setStatus("Reconstruct the night first — nothing to connect yet."); return; }
   $("enrichBtn").disabled = true;
   const stop = busy($("state"), "Connecting the dots…");
-  try { await post("/api/improve"); }
-  catch (e) {}
-  finally { stop(); $("state").textContent = "Connections enriched."; $("enrichBtn").disabled = false; }
+  let msg = "Connections enriched.";
+  try {
+    const d = await post("/api/improve");
+    msg = `Enrichment pass complete — memory holds ${d.edges} connections.`;
+  } catch (e) { msg = "error: " + e.message; }
+  finally { stop(); $("state").textContent = msg; $("enrichBtn").disabled = false; }
 };
 
 $("forgetBtn").onclick = async () => {
   if (!confirm("Close the case and erase all memory?")) return;
   try {
     await post("/api/forget");
-    evidence.length = 0;
+    evidence.length = 0; hasMemory = false;
     $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
     $("answers").innerHTML = ""; $("evCount").textContent = "0";
     $("graphPanel").hidden = true;
+    $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
     setStatus("Case closed. Memory erased.");
   } catch (e) { setStatus("error: " + e.message); }
 };
@@ -118,6 +137,7 @@ $("forgetBtn").onclick = async () => {
 $("recallBtn").onclick = async () => {
   const text = $("query").value.trim();
   if (!text) return;
+  if (!hasMemory) { findings(["No memory on file yet — log evidence and hit Reconstruct first."], "finding", text); return; }
   $("recallBtn").disabled = true;
   const stop = busy($("answers"), "Searching the memory…", { center: true });
   try { const d = await post("/api/recall", { text }); stop(); findings(d.answers, "finding", text); }
@@ -126,6 +146,7 @@ $("recallBtn").onclick = async () => {
 };
 
 $("contraBtn").onclick = async () => {
+  if (!hasMemory) { findings(["No memory on file yet — reconstruct the night first."], "finding"); return; }
   $("contraBtn").disabled = true;
   const stop = busy($("answers"), "Cross-checking for conflicting statements…", { center: true });
   try { const d = await post("/api/contradictions"); stop(); findings(d.conflicts, "finding conflict"); }
@@ -134,6 +155,7 @@ $("contraBtn").onclick = async () => {
 };
 
 $("graphBtn").onclick = () => {
+  if (!hasMemory) { setStatus("Reconstruct the night first — no graph to show yet."); return; }
   const panel = $("graphPanel");
   panel.hidden = false;
   panel.scrollIntoView({ behavior: "smooth" });
