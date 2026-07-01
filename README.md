@@ -1,62 +1,99 @@
 # 🎲 Wingman — Where's My Context?
 
-Your AI woke up in Vegas with no memory of last night. **Wingman** rebuilds it.
+> Your AI woke up in Vegas with no memory of last night. **Wingman** rebuilds it.
 
-Feed it scattered fragments — texts, receipts, blurry photo captions, half-remembered
-names — and it uses [Cognee](https://www.cognee.ai)'s hybrid graph + vector memory to
-reconstruct what happened, then answers your questions: *"What happened last night?
-Who's Sarah? Where's my jacket?"*
+Wingman is a **memory-reconstruction agent**. You feed it the scattered wreckage of a
+night — a bar, a receipt, a blurry photo caption, a 2am text — and it uses
+[**Cognee**](https://www.cognee.ai)'s open-source hybrid **graph + vector** memory to turn
+those fragments into a queryable knowledge graph, then answers *"what happened last night?"*,
+reconstructs a timeline, and even flags the things you misremember.
 
-Built for the [WeMakeDevs × Cognee hackathon](https://www.wemakedevs.org/hackathons/cognee)
-(Jun 29 – Jul 5, 2026), **Best Use of Open Source** track. Runs **100% local, $0** —
-self-hosted Cognee + Ollama, no OpenAI key required.
+Built for the **WeMakeDevs × Cognee hackathon** ("The Hangover Part AI: Where's My
+Context?"), targeting **Best Use of Open Source**. It runs **100% locally, $0, no API keys** —
+self-hosted Cognee + Ollama.
 
-## How it uses Cognee (not just a wrapper)
-Wingman drops to Cognee's primitives to build a real, structured, temporal memory graph:
+---
 
-| Step | Cognee | In Wingman |
-|------|--------|-----------|
-| Ingest | `add()` | Drop each fragment in |
-| Reconstruct | `cognify(temporal_cognify=True)` | Build a typed, time-ordered knowledge graph of the night |
-| Enrich | `memify()` | "Connect the dots" — cross-link entities across fragments |
-| Interrogate | `search(GRAPH_COMPLETION / GRAPH_COMPLETION_COT / TEMPORAL)` | Graph-traversal answers + timeline reconstruction |
-| Visualize | `visualize_graph()` | Live interactive view of the reconstructed memory |
-| Erase | `forget()` | "Erase the night" |
+## Why it fits the theme
 
-Everything goes through `backend/memory.py`, so the backend is swappable for the Cloud track.
+The theme is persistent, cross-session memory. Wingman is that idea made tangible:
+
+- **Persistent** — Cognee writes its graph + vectors to disk. Memories survive restarts.
+- **Cross-session & additive** — new fragments *update* what it knows. Tell it "the jacket
+  was in the taxi, not the pool" and every future answer reflects it.
+- **It reasons over its own memory** — it doesn't just store facts, it recalls, connects, and
+  detects contradictions across them.
+
+## How it uses Cognee (the whole memory lifecycle — not a wrapper)
+
+Every memory operation goes through Cognee's named lifecycle APIs:
+
+| Wingman action | Cognee API | What it does |
+|---|---|---|
+| Commit fragments to memory | **`remember()`** | ingest + build the graph-vector memory |
+| Interrogate the night | **`recall()`** | graph-grounded answers (Ask / Reason / Timeline) |
+| Connect the dots | **`improve()`** | enrich / cross-link memories |
+| Erase the night | **`forget()`** | wipe all memory |
+| Spot contradictions | **`recall(only_context=True)`** | pull the full memory, then reason over it |
+| See the memory | **`visualize_graph()`** | live interactive knowledge graph |
+
+Cognee is the brain. The local LLM only phrases answers over what Cognee retrieves.
+
+## Features
+
+- **🧩 Reconstruct** — messy fragments become a structured knowledge graph.
+- **💬 Interrogate** — natural-language questions, answered from the graph.
+- **🕸️ Live memory graph** — an interactive visualization of exactly what it remembers.
+- **⚔️ Contradiction detection** — flags conflicting memories (e.g. *jacket at the pool*
+  vs *jacket in the taxi*).
+- **♻️ Cross-session memory** — additive and persistent across restarts.
+
+## Architecture
+
+```
+ Browser UI (vanilla JS)
+        |  fragments / questions
+        v
+ FastAPI  -->  backend/memory.py  -->  Cognee  (remember / recall / improve / forget)
+                                          |
+                          +---------------+----------------+
+                          v               v                v
+                    Kuzu graph store   vector store    Ollama (local LLM + embeddings)
+```
+
+Everything routes through `backend/memory.py`, so the memory backend is swappable.
 
 ## Quickstart (local, no OpenAI)
+
 ```bash
 # 1. Local models via Ollama
-ollama serve                 # keep running in its own terminal
-ollama pull llama3.1:8b
-ollama pull nomic-embed-text
+ollama serve
+ollama pull qwen2.5:3b          # LLM (fast, good at structured output)
+ollama pull nomic-embed-text    # embeddings
 
 # 2. Python env + deps
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Config
+# 3. Config (Ollama for both LLM and embeddings, see .env.example)
 cp .env.example .env
 
-# 4. Day-1 gate — prove the local loop before anything else
+# 4. Prove the local loop end-to-end
 python prove_loop.py
 
 # 5. Run the app
-uvicorn backend.main:app --reload      # http://localhost:8000
+uvicorn backend.main:app        # open http://localhost:8000
 ```
 
-## Gotchas
-- **Both** LLM *and* embeddings must be local, or Cognee silently bills OpenAI for embeddings.
-- LLM endpoint ends `/v1`; embedding endpoint ends `/api/embed`. They differ.
-- HTTP 500 on `remember`? Bump Ollama's `num_ctx` via a custom Modelfile.
+## Tech stack
 
+- **Memory:** Cognee 1.2.2 (self-hosted, Apache-2.0) — Kuzu graph + built-in vectors
+- **LLM & embeddings:** Ollama (`qwen2.5:3b`, `nomic-embed-text`) — fully local
+- **Backend:** FastAPI · **Frontend:** vanilla JS
 
-## Roadmap (7-day)
-- **D1** Prove local `forget→remember→recall` loop ✅ scaffolded
-- **D2** Ingestion polish + fragment metadata
-- **D3** Recall + chat UI ✅ scaffolded
-- **D4** `improve()` cross-linking (the wow moment / relational queries)
-- **D5** Vegas-narrative UI polish + seed demo data
-- **D6** `forget()` privacy feature + rigorous testing against the real graph
-- **D7** Demo video + blog + submit
+## Notes
+
+- Runs entirely on CPU with no GPU required; local inference is ~60-90s/query.
+- Config lives in `.env` (`.env.example` documents every key, incl. the Ollama tokenizer,
+  `json_schema_mode` for reliable structured output, and `CACHING=false`).
+- See `DEMO_SCRIPT.md` for the demo walkthrough.
