@@ -8,14 +8,15 @@
 </head>
 <body>
   <header>
-    <h1>🎲 Wingman</h1>
-    <p class="tag">You woke up in Vegas with no memory of last night. Let's reconstruct it.</p>
+    <div class="kicker">Memory reconstruction · built on Cognee</div>
+    <h1>Wingman</h1>
+    <p class="tag">You woke up in Vegas with no memory of last night. Feed it the fragments; it rebuilds the story.</p>
   </header>
 
   <main>
     <section class="panel">
-      <h2>1 · Drop the fragments</h2>
-      <textarea id="fragment" placeholder="A receipt, a blurry photo caption, a half-remembered name..."></textarea>
+      <h2><span class="step">01</span> Drop the fragments</h2>
+      <textarea id="fragment" placeholder="A receipt. A blurry photo caption. A half-remembered name..."></textarea>
       <div class="row">
         <button id="addBtn">Add fragment</button>
         <button id="seedBtn" class="ghost">Load demo night</button>
@@ -24,7 +25,7 @@
     </section>
 
     <section class="panel">
-      <h2>2 · Commit to memory</h2>
+      <h2><span class="step">02</span> Commit to memory</h2>
       <div class="row">
         <button id="reconstructBtn">Remember the night</button>
         <button id="enrichBtn" class="ghost">Connect the dots</button>
@@ -37,7 +38,7 @@
     </section>
 
     <section class="panel wide">
-      <h2>3 · Interrogate the memory</h2>
+      <h2><span class="step">03</span> Interrogate the memory</h2>
       <div class="row">
         <input id="query" placeholder="What happened last night?" />
         <button id="recallBtn">Ask</button>
@@ -47,11 +48,13 @@
     </section>
 
     <section class="panel wide" id="graphPanel" hidden>
-      <h2>🕸️ Memory graph <span class="muted">— what Cognee actually remembers</span></h2>
+      <h2><span class="step">04</span> Memory graph <span class="muted">— what Cognee actually remembers</span></h2>
       <p id="graphLoading" class="state"></p>
       <iframe id="graphFrame" title="Cognee memory graph"></iframe>
     </section>
   </main>
+
+  <footer>Self-hosted Cognee · local models · no API keys</footer>
 
   <script src="/static/app.js"></script>
 </body>
