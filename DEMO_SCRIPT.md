@@ -1,6 +1,7 @@
 # Wingman — Demo Video Script (target 2:30–3:00)
 
-**Goal:** show deep, genuine use of open-source Cognee + the cross-session memory theme, in a way that's memorable. Record at 1080p; keep it tight.
+**Goal:** show deep, genuine use of open-source Cognee + the cross-session memory theme, in a way that's memorable.
+**Angle (say it):** this isn't a party trick — the same reconstruct-and-flag-conflicts engine works on outage post-mortems, investigation notes, scattered research. The Vegas night is just the stress test. (In-app: the "Demo: an outage" button proves it.) Record at 1080p; keep it tight.
 
 ## Before you hit record (prep)
 - `ollama serve` running; pre-warm: `ollama run qwen2.5:3b "ok"` (avoids cold-start pauses on camera).
@@ -31,9 +32,9 @@
 - Then add a NEW fragment: *"I left my jacket in the taxi, not the pool"* → **Remember** → ask **"Where's my jacket?"** → answer updates to the taxi.
 - **VO:** "I interrogate the memory — answers come straight from the graph. And this is the point: Cognee memory is persistent and additive. I add a new fact, it updates what it knows, and it's still there next session — even after a restart. Stateless AI, solved. Context that survives, across infinite sessions."
 
-### 2:15–2:40 — Contradiction detection (the differentiator)
+### 2:15–2:40 — Contradiction detection (THE differentiator — lead with this)
 - Click **Spot contradictions** → show `CONFLICT: jacket at the pool || jacket in the taxi`.
-- **VO:** "And it reasons over its own memory to flag conflicts — the pool story versus the taxi story. Cognee catches what I misremembered."
+- **VO:** "Here's what most memory tools can't do: it reasons over its own memory and flags conflicts — the pool story versus the taxi story. Memory that notices when it's being lied to. Swap the Vegas night for an outage post-mortem or conflicting witness statements and it does the same thing — that's the real use."
 
 ### 2:40–3:00 — Close
 - Cut to: the repo / "Best Use of Open Source Cognee".

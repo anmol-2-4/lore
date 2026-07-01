@@ -11,6 +11,16 @@ const DEMO = [
   "I'm now pretty sure I left my jacket in the back of the taxi, not at the pool.",
 ];
 
+const DEMO_INCIDENT = [
+  "02:14 — PagerDuty: checkout API 5xx error rate spiking.",
+  "On-call (Priya): pretty sure the 2pm deploy of the payments service caused this.",
+  "Migration log: 'add orders index' migration started at 01:45.",
+  "Grafana: checkout error rate climbed sharply at 01:50, before the 2pm deploy.",
+  "Rolling back the 2pm payments deploy at 02:40 did NOT clear the errors.",
+  "Sam: agreed with Priya, it was the payments deploy.",
+  "DB: the orders-index migration held a write lock on the orders table until 02:55; errors cleared at 02:56.",
+];
+
 const evidence = [];
 let hasMemory = false;
 
@@ -90,12 +100,15 @@ $("addBtn").onclick = async () => {
   $("addBtn").disabled = false;
 };
 
-$("seedBtn").onclick = async () => {
-  $("seedBtn").disabled = true;
-  for (const f of DEMO) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
+async function loadSet(list, btnId) {
+  const btn = $(btnId);
+  btn.disabled = true;
+  for (const f of list) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
   setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
-  $("seedBtn").disabled = false;
-};
+  btn.disabled = false;
+}
+$("seedBtn").onclick = () => loadSet(DEMO, "seedBtn");
+$("seedBtn2").onclick = () => loadSet(DEMO_INCIDENT, "seedBtn2");
 
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;

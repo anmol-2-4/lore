@@ -2,13 +2,17 @@
 
 > Your AI woke up in Vegas with no memory of last night. **Wingman** rebuilds it.
 
-Wingman is a **memory-reconstruction agent**. You feed it the scattered wreckage of a
-night — a bar, a receipt, a blurry photo caption, a 2am text — and it uses
-[**Cognee**](https://www.cognee.ai)'s open-source hybrid **graph + vector** memory to turn
-those fragments into a queryable knowledge graph, then answers *"what happened last night?"*,
-reconstructs a timeline, and even flags the things you misremember.
+Wingman **reconstructs context from scattered, contradictory fragments** — and flags the parts
+that don't add up. Feed it the debris (notes, receipts, log lines, half-remembered names,
+conflicting accounts) and it uses [**Cognee**](https://www.cognee.ai)'s open-source hybrid
+**graph + vector** memory to build a queryable knowledge graph, answer questions from it, and —
+the part most tools skip — **catch the contradictions**.
 
-**In one line:** a personal knowledge-graph copilot for the messiest data of all — human memory.
+The headline demo is a night in Vegas you can't remember. But the same engine reconstructs
+anything fragmented and conflicting: outage post-mortems, investigation notes, research
+scattered across a dozen sources.
+
+**In one line:** memory that not only recalls — it notices when it's being lied to.
 
 Built for the **WeMakeDevs × Cognee hackathon** ("The Hangover Part AI: Where's My
 Context?"), targeting **Best Use of Open Source**. It runs **100% locally, $0, no API keys** —
@@ -26,6 +30,19 @@ and carry context across infinite sessions*.
 Wingman is that fix, proven on the **hardest possible input**: fragmented, contradictory human
 memory of a night out. If it can rebuild *that* into a coherent, queryable, persistent memory
 — and catch what you misremember — ordinary agent context is easy.
+
+## Beyond the demo — where this is actually useful
+
+The Vegas night is a deliberate stress test (fragmented, contradictory, low-signal). The same
+reconstruct-and-check engine applies wherever context is scattered across conflicting sources:
+
+- **Incident post-mortems** — rebuild an outage from logs and on-call accounts, and surface
+  where the accounts conflict. *(Ships in-app as a second demo: "Demo: an outage".)*
+- **Investigations / witness notes** — assemble a case from statements that don't agree.
+- **Research synthesis** — pull scattered findings into one graph and flag contradictory claims.
+- **Meeting & interview notes** — reconstruct what was decided when accounts differ.
+
+The common thread: **memory that not only recalls, but notices when it's being lied to.**
 
 ## Where it fits the hackathon
 
@@ -57,11 +74,12 @@ Cognee is the brain. The local LLM only phrases answers over what Cognee retriev
 
 ## Features
 
+**The differentiator — it doesn't just remember, it catches contradictions.**
+
+- **⚔️ Contradiction detection** — flags conflicting memories (e.g. *jacket at the pool*
 - **🧩 Reconstruct** — messy fragments become a structured knowledge graph.
 - **💬 Interrogate** — natural-language questions, answered from the graph.
 - **🕸️ Live memory graph** — an interactive visualization of exactly what it remembers.
-- **⚔️ Contradiction detection** — flags conflicting memories (e.g. *jacket at the pool*
-  vs *jacket in the taxi*).
 - **♻️ Cross-session memory** — additive and persistent across restarts.
 
 ## Architecture
