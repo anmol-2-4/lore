@@ -2,28 +2,16 @@ const $ = (id) => document.getElementById(id);
 const setStatus = (msg) => { $("statusText").textContent = msg; };
 
 const DEMO = [
-  "Around 9pm I was at the Bellagio bar with someone named Sarah.",
-  "Sarah said she works as a blackjack dealer and lost my jacket at the pool.",
-  "Receipt for $240 from 'Neon Noodle' timestamped 1:14am.",
-  "Blurry photo caption: 'me + Sarah + a guy in an Elvis costume'.",
-  "Hotel keycard sleeve: room 1207, The Venetian.",
-  "Text from an unknown number at 2:03am: 'you still owe me for the cab lol'.",
-  "I'm now pretty sure I left my jacket in the back of the taxi, not at the pool.",
+  "We chose PostgreSQL over MongoDB because our core data — users, orders, and invoices — is highly relational and we rely on foreign keys and transactions.",
+  "Auth uses short-lived JWT access tokens instead of server-side sessions, because the mobile app can't reliably persist cookies.",
+  "We moved the job queue onto Redis after the old in-memory queue dropped every pending task on each deploy restart.",
+  "The payments module sits behind a provider interface so we can swap Stripe for Razorpay in regions where Stripe isn't supported.",
+  "The public API is rate-limited to 100 requests per minute per key, after scrapers hammered it in March.",
+  "As of April we froze the v1 REST API — new clients must use v2, which uses cursor-based pagination.",
+  "Marketing pages are server-rendered for SEO, but the logged-in dashboard is a single-page app.",
 ];
 
-const DEMO_INCIDENT = [
-  "02:14 — PagerDuty: checkout API 5xx error rate spiking.",
-  "On-call (Priya): pretty sure the 2pm deploy of the payments service caused this.",
-  "Migration log: 'add orders index' migration started at 01:45.",
-  "Grafana: checkout error rate climbed sharply at 01:50, before the 2pm deploy.",
-  "Rolling back the 2pm payments deploy at 02:40 did NOT clear the errors.",
-  "Sam: agreed with Priya, it was the payments deploy.",
-  "DB: the orders-index migration held a write lock on the orders table until 02:55; errors cleared at 02:56.",
-];
-
-const QUESTIONS_NIGHT = ["what happened last night?", "who is Sarah?", "where is my jacket?"];
-const QUESTIONS_INCIDENT = ["what caused the outage?", "was it the 2pm deploy?", "build the timeline of the incident"];
-let questions = QUESTIONS_NIGHT;
+const QUESTIONS = ["why did we choose Postgres?", "why JWT instead of sessions?", "can we swap the payments provider?"];
 
 const evidence = [];
 let hasMemory = false;
@@ -33,7 +21,7 @@ function renderChips() {
   const box = $("chips");
   box.innerHTML = "";
   if (!hasMemory) return;
-  for (const q of questions) {
+  for (const q of QUESTIONS) {
     const b = document.createElement("button");
     b.className = "chip";
     b.textContent = q;
@@ -67,10 +55,9 @@ function addCard(text) {
   const n = evidence.length;
   const card = document.createElement("div");
   card.className = "card";
-  card.style.setProperty("--rot", (n % 2 ? "-0.8deg" : "0.9deg"));
   const tag = document.createElement("div");
   tag.className = "etag";
-  tag.textContent = "EXHIBIT " + String(n).padStart(2, "0");
+  tag.textContent = "NOTE " + String(n).padStart(2, "0");
   const body = document.createElement("div");
   body.className = "ebody";
   body.textContent = text;
@@ -105,7 +92,7 @@ function findings(items, cls, query) {
   try {
     const s = await (await fetch("/api/status")).json();
     hasMemory = s.has_memory;
-    if (hasMemory) { $("storyHint").textContent = "Memory on file. Ask it anything below."; renderChips(); }
+    if (hasMemory) { $("storyHint").textContent = "Memory on file from a previous session — ask it anything below."; renderChips(); }
   } catch (e) {}
 })();
 
@@ -113,48 +100,46 @@ $("addBtn").onclick = async () => {
   const text = $("fragment").value.trim();
   if (!text) return;
   $("addBtn").disabled = true;
-  try { await post("/api/fragment", { text }); addCard(text); $("fragment").value = ""; setStatus(`${evidence.length} pieces of evidence logged.`); }
+  try { await post("/api/fragment", { text }); addCard(text); $("fragment").value = ""; setStatus(`${evidence.length} notes staged.`); }
   catch (e) { setStatus("error: " + e.message); }
   $("addBtn").disabled = false;
 };
 
-async function loadSet(list, btnId, qs) {
-  questions = qs || QUESTIONS_NIGHT;
+async function loadSet(list, btnId) {
   const btn = $(btnId);
   btn.disabled = true;
-  // scope to this case: wipe any prior memory + evidence so scenarios don't mix
-  setStatus("Clearing the previous case…");
+  // fresh slate: wipe any prior memory + notes so the demos don't bleed into each other
+  setStatus("Clearing previous memory…");
   try { await post("/api/forget"); } catch (e) {}
   evidence.length = 0;
   hasMemory = false;
-  $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+  $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing remembered yet.</p>';
   $("answers").innerHTML = "";
   $("evCount").textContent = "0";
   $("graphPanel").hidden = true;
-  $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+  $("storyHint").textContent = "Build the memory, then ask it anything — including in a brand-new session.";
   renderChips();
   for (const f of list) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
-  setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
+  setStatus(`${evidence.length} notes staged — now Build memory.`);
   btn.disabled = false;
 }
-$("seedBtn").onclick = () => loadSet(DEMO, "seedBtn", QUESTIONS_NIGHT);
-$("seedBtn2").onclick = () => loadSet(DEMO_INCIDENT, "seedBtn2", QUESTIONS_INCIDENT);
+$("seedBtn").onclick = () => loadSet(DEMO, "seedBtn");
 
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;
-  const stop = busy($("state"), "Reconstructing the night into memory…");
+  const stop = busy($("state"), "Building memory from your notes…");
   try {
     const d = await post("/api/reconstruct");
     hasMemory = true;
     renderChips();
-    setStatus("Memory reconstructed. Interrogate it, or open the connection board.");
-    $("storyHint").textContent = `Memory built — ${d.nodes || ""} facts. Ask it anything below.`;
+    setStatus("Memory built. Ask it anything, or open the memory graph.");
+    $("storyHint").textContent = `Memory built — ${d.nodes || ""} facts connected. Ask it anything below.`;
   } catch (e) { setStatus("error: " + e.message); }
   finally { stop(); $("state").textContent = ""; $("reconstructBtn").disabled = false; }
 };
 
 $("enrichBtn").onclick = async () => {
-  if (!hasMemory) { setStatus("Reconstruct the night first — nothing to connect yet."); return; }
+  if (!hasMemory) { setStatus("Build the memory first — nothing to connect yet."); return; }
   $("enrichBtn").disabled = true;
   const stop = busy($("state"), "Connecting the dots…");
   let msg = "Connections enriched.";
@@ -166,23 +151,23 @@ $("enrichBtn").onclick = async () => {
 };
 
 $("forgetBtn").onclick = async () => {
-  if (!confirm("Close the case and erase all memory?")) return;
+  if (!confirm("Forget everything Lore has learned?")) return;
   try {
     await post("/api/forget");
     evidence.length = 0; hasMemory = false;
-    $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+    $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing remembered yet.</p>';
     $("answers").innerHTML = ""; $("evCount").textContent = "0";
     $("graphPanel").hidden = true;
-    $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+    $("storyHint").textContent = "Build the memory, then ask it anything — including in a brand-new session.";
     renderChips();
-    setStatus("Case closed. Memory erased.");
+    setStatus("Memory wiped clean.");
   } catch (e) { setStatus("error: " + e.message); }
 };
 
 $("recallBtn").onclick = async () => {
   const text = $("query").value.trim();
   if (!text) return;
-  if (!hasMemory) { findings(["No memory on file yet — log evidence and hit Reconstruct first."], "finding", text); return; }
+  if (!hasMemory) { findings(["No memory yet — remember some notes and build it first."], "finding", text); return; }
   $("recallBtn").disabled = true;
   const stop = busy($("answers"), "Searching the memory…", { center: true });
   try { const d = await post("/api/recall", { text }); stop(); findings(d.answers, "finding", text); }
@@ -190,21 +175,12 @@ $("recallBtn").onclick = async () => {
   finally { $("recallBtn").disabled = false; }
 };
 
-$("contraBtn").onclick = async () => {
-  if (!hasMemory) { findings(["No memory on file yet — reconstruct the night first."], "finding"); return; }
-  $("contraBtn").disabled = true;
-  const stop = busy($("answers"), "Cross-checking for conflicting statements…", { center: true });
-  try { const d = await post("/api/contradictions"); stop(); findings(d.conflicts, "finding conflict"); }
-  catch (e) { stop(); findings(["error: " + e.message], "finding"); }
-  finally { $("contraBtn").disabled = false; }
-};
-
 $("graphBtn").onclick = () => {
-  if (!hasMemory) { setStatus("Reconstruct the night first — no graph to show yet."); return; }
+  if (!hasMemory) { setStatus("Build the memory first — no graph to show yet."); return; }
   const panel = $("graphPanel");
   panel.hidden = false;
   panel.scrollIntoView({ behavior: "smooth" });
-  const stop = busy($("graphLoading"), "Laying out the connection board…");
+  const stop = busy($("graphLoading"), "Laying out the memory graph…");
   const frame = $("graphFrame");
   frame.onload = () => { stop(); $("graphLoading").textContent = ""; };
   frame.src = "/api/graph?t=" + Date.now();

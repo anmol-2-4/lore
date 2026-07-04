@@ -1,4 +1,4 @@
-# Wingman — submission copy (paste into the form)
+# Lore — submission copy (paste into the form)
 
 **Track:** Best Use of Open Source
 **Repo:** https://github.com/anmol-2-4/wingman
@@ -7,37 +7,39 @@
 ---
 
 ## Tagline (one line)
-Wingman — "Where's My Context?": persistent, self-hosted memory that ends AI amnesia.
+Lore — the memory your codebase keeps: persistent, self-hosted memory that remembers *why*
+your project is the way it is, across sessions and restarts.
 
 ## Short description (2–3 sentences)
-Wingman turns scattered, contradictory fragments into a persistent, queryable knowledge
-graph using Cognee's open-source hybrid graph-vector memory — running 100% locally, no API
-keys. It's the "where's my context?" problem made tangible: you wake up in Vegas with no
-memory of last night, and Wingman reconstructs it — then even flags what you misremember.
+Lore gives a codebase a permanent memory. You record the decisions and the *why* behind them,
+and Cognee's open-source hybrid graph-vector memory turns them into a queryable knowledge
+graph — so weeks later, or in a brand-new session after a full restart, you can ask "why did we
+choose Postgres?" and get the answer from memory — connecting facts across separate notes that
+no single note states outright. It runs 100% locally, no API keys.
 
 ## The problem
-LLMs are stateless: every request forgets the last session and overflows the context window.
-Agents lose the plot; users re-explain themselves forever. The fix is a permanent, self-hosted,
-hybrid graph-vector memory that lets an agent retain, connect, and carry context across
-infinite sessions.
+Every developer asks "why did we do it this way?" — and every AI assistant asks it too, on
+every session. LLMs are stateless: a new chat forgets the last, and the context window
+overflows long before a project's history fits. So the *why* behind an architecture lives in
+people's heads and dies when they leave. The fix is a permanent, self-hosted, hybrid
+graph-vector memory that retains, connects, and carries context across infinite sessions.
 
 ## What it does
-Drop in the wreckage of a night — a bar, a receipt, a blurry photo caption, a 2am text.
-Wingman uses Cognee to build a knowledge graph from it, then lets you:
-- **Interrogate** it in natural language ("What happened last night? Where's my jacket?")
-- **Visualize** the reconstructed memory as a live interactive graph
-- **Detect contradictions** across memories (e.g. "jacket at the pool" vs "jacket in the taxi")
-- **Remember across sessions** — memory is persistent and additive; new facts update what it
-  knows and survive restarts.
+You tell Lore your project's decisions ("auth uses JWT because mobile can't hold cookies"). It
+uses Cognee to build a knowledge graph, then lets you:
+- **Ask the codebase *why*** in natural language, answered from the graph.
+- **Recall across sessions** — the headline: kill the process, reopen fresh, and the memory is
+  still there. No re-explaining. A plain LLM chat can't do this.
+- **Multi-hop recall** — it connects facts across separate notes that no single note states.
+- **Visualize** the memory as a live interactive graph.
 
-## How it uses Cognee (the memory lifecycle, deeply)
-Every memory operation runs through Cognee's named APIs — Cognee is the brain; the local LLM
-only phrases answers over what Cognee retrieves:
-- **`remember()`** — ingests fragments and builds the hybrid graph-vector memory
+## How it uses Cognee (the memory lifecycle + hybrid graph-vector layer, deeply)
+Every memory operation runs through Cognee's named APIs over its hybrid graph-vector memory
+layer — Cognee is the brain; the local LLM only phrases answers over what Cognee retrieves:
+- **`remember()`** — ingests a decision and builds the hybrid graph-vector memory
 - **`recall()`** — graph-traversal answers grounded in the memory
-- **`improve()`** — cross-links and enriches memories
+- **`improve()`** — cross-links and enriches related decisions
 - **`forget()`** — wipes memory
-- **`recall(only_context=True)`** — powers Cognee-native contradiction detection
 - **`visualize_graph()`** — the live memory graph
 
 ## Why "Best Use of Open Source"

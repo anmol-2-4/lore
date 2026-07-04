@@ -1,46 +1,68 @@
-# Wingman — Demo Video Script (target 2:30–3:00)
+# Lore — Demo Video Script (target 2:30–3:00)
 
-**Goal:** show deep, genuine use of open-source Cognee + the cross-session memory theme, in a way that's memorable.
-**Angle (say it):** this isn't a party trick — the same reconstruct-and-flag-conflicts engine works on outage post-mortems, investigation notes, scattered research. The Vegas night is just the stress test. (In-app: the "Demo: an outage" button proves it.) Record at 1080p; keep it tight.
+**Goal:** show deep, genuine use of open-source Cognee, and land the theme — *an agent that
+never forgets* — with a beat a plain LLM literally cannot do: **memory that survives a full
+restart.**
+**The one thing to nail:** the restart. Teach it, kill the process, reopen, and it still knows
+*why*. Everything else supports that.
+Record at 1080p; keep it tight.
 
 ## Before you hit record (prep)
 - `ollama serve` running; pre-warm: `ollama run qwen2.5:3b "ok"` (avoids cold-start pauses on camera).
 - Start server: `uvicorn backend.main:app` → open `http://localhost:8000`.
-- Local LLM on CPU is slow (~60–90s/query). **Record in segments and cut the wait**, OR speed up 4–8x in editing. Never show a 90s frozen screen.
-- Have the fragment list ready to paste. Have the graph tab ready.
+- Local LLM on CPU is slow (~60–90s/query). **Record in segments and cut the wait**, OR speed
+  up 4–8× in editing. Never show a 90s frozen screen.
+- Have a second terminal visible for the restart beat — the kill + relaunch should be on camera.
 
 ## Shot list
 
-### 0:00–0:15 — Hook
-- On screen: the Wingman header (Vegas vibe).
-- **VO:** "Every LLM call is stateless — it forgets the last session and overflows its context window. That's the whole problem. Wingman fixes it with persistent memory. The demo: your AI woke up in Vegas with no memory of last night, and it rebuilds the context from scattered fragments — using Cognee's open-source graph-vector memory, 100% local, zero API keys."
+### 0:00–0:20 — Hook (the problem)
+- On screen: the Lore header — *"The memory your codebase keeps."*
+- **VO:** "Every time you open a new session, your AI assistant forgets why your project is the
+  way it is. LLMs are stateless — they lose the last session and overflow their context window.
+  So the *why* behind your architecture lives in people's heads and disappears when they leave.
+  Lore fixes that with persistent memory, built on Cognee's open-source graph-vector engine,
+  100% local, zero API keys."
 
-### 0:15–0:45 — Drop the fragments
-- Click **Load demo night** → fragments stream into the log.
-- **VO:** "I feed it the wreckage of the night — a bar, a receipt, a blurry photo caption, a 2am text. Messy, contradictory, human."
+### 0:20–0:45 — Teach it (the Cognee core)
+- Click **Demo: a project** → real decisions stream into the memory column.
+- Click **Build memory**. (Cut the wait.)
+- **VO:** "I record my project's decisions — why Postgres over Mongo, why JWT instead of
+  sessions, why the job queue moved to Redis. One call to Cognee's `remember()` turns them into
+  a knowledge graph. This is the hybrid graph-vector memory doing the work, not a plain prompt."
 
-### 0:45–1:15 — Remember (the Cognee core)
-- Click **Remember the night**. (Cut the wait.)
-- **VO:** "One call to Cognee's `remember()` turns these into a knowledge graph — entities, relationships, the works. This is `add` + `cognify` under the hood: the hybrid graph-vector memory doing the heavy lifting, not a plain LLM."
+### 0:45–1:10 — See the memory (the wow shot)
+- Click **Memory graph** → the interactive node graph opens. Slowly pan/zoom.
+- **VO:** "This is the actual memory Cognee built — the decisions, the systems, and how they
+  connect. Dozens of nodes from a handful of notes."
 
-### 1:15–1:45 — See the memory (the wow shot)
-- Click **View memory graph** → the interactive node graph opens. Slowly pan/zoom.
-- **VO:** "This is the actual memory Cognee built — me, Sarah, the Bellagio, the cab, all connected. 40-plus nodes from six fragments."
+### 1:10–1:35 — Ask *why* + multi-hop recall
+- Ask: **"why did we choose Postgres?"** → graph-grounded answer.
+- Ask: **"why JWT instead of sessions?"** → answer connects *mobile can't hold cookies* → *so
+  we use JWT*, a link no single note states outright.
+- **VO:** "Now I ask the codebase *why*. Answers come straight from the graph — and it connects
+  facts across separate notes to explain a decision no single note spells out."
 
-### 1:45–2:15 — Interrogate + cross-session (THE HERO BEAT — this is the point)
-- Ask: **"What happened last night?"** → show the reconstructed narrative.
-- Then add a NEW fragment: *"I left my jacket in the taxi, not the pool"* → **Remember** → ask **"Where's my jacket?"** → answer updates to the taxi.
-- **VO:** "I interrogate the memory — answers come straight from the graph. And this is the point: Cognee memory is persistent and additive. I add a new fact, it updates what it knows, and it's still there next session — even after a restart. Stateless AI, solved. Context that survives, across infinite sessions."
+### 1:35–2:20 — THE HERO BEAT: memory that survives a restart
+- Cut to the terminal. **Ctrl-C the server. Show it fully stopped.** Relaunch
+  `uvicorn backend.main:app`. Reload the page in a fresh tab.
+- On load, the UI shows: *"Memory on file from a previous session."*
+- Ask the SAME question again: **"why don't we use cookie sessions?"** → it still answers.
+- **VO:** "Here's the whole point. I kill the process completely — new session, nothing in
+  context. I reopen, and the memory is still there. I ask again, and it still knows: mobile
+  can't hold cookies, so auth uses JWT. That's what a plain LLM chat can never do. Cognee
+  persisted the graph to disk. Context that survives — across infinite sessions."
 
-### 2:15–2:40 — Contradiction detection (THE differentiator — lead with this)
-- Click **Spot contradictions** → show `CONFLICT: jacket at the pool || jacket in the taxi`.
-- **VO:** "Here's what most memory tools can't do: it reasons over its own memory and flags conflicts — the pool story versus the taxi story. Memory that notices when it's being lied to. Swap the Vegas night for an outage post-mortem or conflicting witness statements and it does the same thing — that's the real use."
+### 2:20–2:40 — Open the memory graph (optional wow shot to close on)
+- Click **Memory graph** if you didn't earlier, and let it settle on screen under the close VO.
 
 ### 2:40–3:00 — Close
 - Cut to: the repo / "Best Use of Open Source Cognee".
-- **VO:** "Wingman. Persistent memory for AI, fully open source, fully local. Built on Cognee."
+- **VO:** "Lore. Persistent memory for your codebase — fully open source, fully local. Built on
+  Cognee."
 
 ## Lines to hit for judges (say the words)
 - "Cognee's `remember` / `recall` / `improve` / `forget`" (name the lifecycle).
+- "hybrid graph-vector memory."
 - "open-source, self-hosted, 100% local, no API keys."
-- "persistent, cross-session memory."
+- "persistent, cross-session memory — it survives a restart."

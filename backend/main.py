@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend import analysis, memory
+from backend import memory
 
 ROOT = Path(__file__).resolve().parent.parent
 FRONTEND = ROOT / "frontend"
@@ -50,11 +50,6 @@ async def reconstruct():
 @app.post("/api/recall")
 async def recall(q: Query):
     return {"answers": await memory.recall(q.text)}
-
-
-@app.post("/api/contradictions")
-async def contradictions():
-    return {"conflicts": await analysis.find_contradictions()}
 
 
 @app.post("/api/improve")

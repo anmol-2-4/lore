@@ -65,9 +65,9 @@ button:disabled { opacity:.45; cursor:wait; filter:none; transform:none; }
 .card { position:relative; background:var(--card); border:1px solid #322c22; border-radius:4px;
   padding:.65rem .8rem; margin:.9rem 0; transform:rotate(var(--rot,0deg));
   box-shadow:0 7px 16px rgba(0,0,0,.4); transition:transform .15s, box-shadow .15s; }
-.card:hover { transform:rotate(0deg) translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.5); }
-.card::before { content:""; position:absolute; top:-6px; left:16px; width:9px; height:9px; border-radius:50%;
-  background:var(--red); box-shadow:0 1px 3px rgba(0,0,0,.6); }
+.card:hover { transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.5); }
+.card::before { content:""; position:absolute; top:0; left:0; width:2px; height:100%;
+  background:var(--amber); opacity:.5; border-radius:4px 0 0 4px; }
 .card .etag { font-family:var(--mono); font-size:.6rem; letter-spacing:.15em; color:var(--amber); }
 .card .ebody { font-size:.86rem; color:#d8d0c0; line-height:1.4; margin-top:.2rem; }
 
@@ -103,11 +103,7 @@ button:disabled { opacity:.45; cursor:wait; filter:none; transform:none; }
 
 @media (max-width:760px){ .board{ grid-template-columns:1fr; } .casebar h1{ font-size:2.1rem; } }
 
-/* dossier execution pass */
 .card { background:linear-gradient(174deg, #201c14 0%, #1c1913 60%, #1a1712 100%); }
-.card::after { content:""; position:absolute; top:-8px; right:14px; width:46px; height:16px;
-  background:rgba(228,221,207,.08); border:1px solid rgba(228,221,207,.06);
-  transform:rotate(-4deg); border-radius:1px; }
-.stamp { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; color:var(--red);
-  border:2px solid var(--red); border-radius:3px; padding:.18rem .5rem .14rem .62rem;
-  transform:rotate(-6deg); opacity:.82; margin-left:auto; }
+.stamp { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; color:var(--amber);
+  border:2px solid var(--amber); border-radius:3px; padding:.18rem .5rem .14rem .62rem;
+  transform:rotate(-4deg); opacity:.85; margin-left:auto; }

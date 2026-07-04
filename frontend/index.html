@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wingman — Where's My Context?</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>" />
+  <title>Lore — the memory your codebase keeps</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header class="casebar">
-    <div class="filetag">CASE FILE · WNGMN-04B · built on Cognee</div>
-    <h1>Where's my context?</h1>
-    <p class="status"><span class="dot"></span><span id="statusText">A night in Vegas. No memory. Reconstruct it from the evidence.</span></p>
+    <div class="filetag">LORE · built on Cognee</div>
+    <h1>The memory your codebase keeps.</h1>
+    <p class="status"><span class="dot"></span><span id="statusText">Every decision and every "why" — remembered across sessions, even after a restart.</span></p>
     <div class="lifecycle">
       <span class="verb">remember()</span><span class="arrow">→</span>
       <span class="verb">recall()</span><span class="arrow">→</span>
@@ -23,40 +23,38 @@
 
   <main class="board">
     <section class="col evidence">
-      <div class="colhead">Evidence <span id="evCount" class="count">0</span></div>
-      <textarea id="fragment" placeholder="a receipt · a blurry photo · a half-remembered name"></textarea>
+      <div class="colhead">Memory <span id="evCount" class="count">0</span></div>
+      <textarea id="fragment" placeholder="a decision · a &quot;why&quot; · an architecture note"></textarea>
       <div class="row">
-        <button id="addBtn">Log it</button>
-        <button id="seedBtn" class="ghost">Demo: the night</button>
-        <button id="seedBtn2" class="ghost">Demo: an outage</button>
+        <button id="addBtn">Remember it</button>
+        <button id="seedBtn" class="ghost">Load demo project</button>
       </div>
-      <div id="cards" class="cards"><p class="hint" id="emptyEv">Nothing logged yet.</p></div>
+      <div id="cards" class="cards"><p class="hint" id="emptyEv">Nothing remembered yet.</p></div>
       <div class="row actions">
-        <button id="reconstructBtn">Reconstruct</button>
+        <button id="reconstructBtn">Build memory</button>
         <button id="enrichBtn" class="ghost">Connect the dots</button>
       </div>
       <div class="row">
-        <button id="graphBtn" class="ghost">Connection board</button>
-        <button id="forgetBtn" class="danger">Close case</button>
+        <button id="graphBtn" class="ghost">Memory graph</button>
+        <button id="forgetBtn" class="danger">Forget all</button>
       </div>
       <p id="state" class="state"></p>
     </section>
 
     <section class="col story">
-      <div class="colhead">The story <span id="stamp" class="stamp" hidden>RECONSTRUCTED</span></div>
-      <p class="hint lead" id="storyHint">Reconstruct the night, then interrogate the memory below.</p>
+      <div class="colhead">Recall <span id="stamp" class="stamp" hidden>REMEMBERED</span></div>
+      <p class="hint lead" id="storyHint">Build the memory, then ask it anything — including in a brand-new session.</p>
       <div class="askbar">
         <span class="prompt">ask&gt;</span>
-        <input id="query" placeholder="what happened last night?" />
+        <input id="query" placeholder="why did we choose Postgres?" />
         <button id="recallBtn">Ask</button>
-        <button id="contraBtn" class="ghost">Find conflicts</button>
       </div>
       <div id="chips" class="chips"></div>
       <div id="answers"></div>
     </section>
 
     <section class="col wide" id="graphPanel" hidden>
-      <div class="colhead">Connection board <span class="muted">— what Cognee remembers</span></div>
+      <div class="colhead">Memory graph <span class="muted">— what Cognee connected</span></div>
       <p id="graphLoading" class="state"></p>
       <iframe id="graphFrame" title="memory graph"></iframe>
     </section>
