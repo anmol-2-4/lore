@@ -13,3 +13,8 @@ cognee/
 data/graph.html
 
 data/.memory
+
+# local working files (demo video build, submission notes)
+demo/
+SUBMISSION.md
+DEMO_SCRIPT.md

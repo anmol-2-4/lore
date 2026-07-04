@@ -126,4 +126,4 @@ uvicorn backend.main:app        # open http://localhost:8000
 - Runs entirely on CPU with no GPU required; local inference is ~60-90s/query.
 - Config lives in `.env` (`.env.example` documents every key, incl. the Ollama tokenizer,
   `json_schema_mode` for reliable structured output, and `CACHING=false`).
-- See `DEMO_SCRIPT.md` for the demo walkthrough.
+- `prove_loop.py` runs the whole remember → recall loop from the terminal, no UI needed.

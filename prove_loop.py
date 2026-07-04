@@ -4,18 +4,18 @@ load_dotenv()
 
 from backend import memory
 
-FRAGMENTS = [
-    "Around 9pm I was at the Bellagio bar with someone named Sarah.",
-    "Sarah said she works as a blackjack dealer and lost my jacket at the pool.",
-    "Receipt for $240 from 'Neon Noodle' timestamped 1:14am.",
-    "Blurry photo caption: 'me + Sarah + a guy in an Elvis costume'.",
+DECISIONS = [
+    "We chose PostgreSQL over MongoDB because our core data is highly relational.",
+    "Auth uses short-lived JWT access tokens because the mobile app can't reliably persist cookies.",
+    "We moved the job queue onto Redis after the in-memory queue dropped tasks on every deploy.",
+    "The public API is rate-limited to 100 requests per minute per key.",
 ]
 
 
 async def main():
     await memory.forget()
-    await memory.remember(FRAGMENTS)
-    for q in ["What happened last night?", "Who is Sarah?", "Where is my jacket?"]:
+    await memory.remember(DECISIONS)
+    for q in ["Why did we choose Postgres?", "Why JWT instead of sessions?", "Why is the queue on Redis?"]:
         print(f"\n> {q}")
         for answer in await memory.recall(q):
             print("  " + answer)

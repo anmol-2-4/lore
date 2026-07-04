@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FRONTEND = ROOT / "frontend"
 GRAPH_FILE = ROOT / "data" / "graph.html"
 MARKER = ROOT / "data" / ".memory"   # reliable "memory exists" flag (cold-safe)
-app = FastAPI(title="Wingman")
+app = FastAPI(title="Lore")
 
 _staged: list[str] = []
 
