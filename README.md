@@ -58,6 +58,15 @@ wherever a team's context is scattered and easily lost:
 
 The common thread: **persistent memory of the decisions a team can't afford to forget.**
 
+## Features
+
+- **♻️ Cross-session memory** — the headline: decisions persist across restarts, so a new
+  session already knows *why*.
+- **💬 Ask the codebase *why*** — natural-language questions, answered from the graph.
+- **🧩 Multi-hop recall** — connects facts across separate notes ("mobile can't hold cookies"
+  → "so auth uses JWT") that no single note states outright.
+- **🕸️ Live memory graph** — an interactive visualization of exactly what it remembers.
+
 ## How it uses Cognee (the whole memory lifecycle — not a wrapper)
 
 Every memory operation goes through Cognee's named lifecycle APIs, over its **hybrid
@@ -74,15 +83,6 @@ graph-vector memory layer**:
 Cognee is the brain. The local LLM only phrases answers over what Cognee retrieves.
 
 ![The live memory graph Cognee built from seven short notes — 7 documents, 25 entities, 17 types, 7 summaries, 75 edges — spanning chunks, entities, and their relationships.](assets/graph.png)
-
-## Features
-
-- **♻️ Cross-session memory** — the headline: decisions persist across restarts, so a new
-  session already knows *why*.
-- **💬 Ask the codebase *why*** — natural-language questions, answered from the graph.
-- **🧩 Multi-hop recall** — connects facts across separate notes ("mobile can't hold cookies"
-  → "so auth uses JWT") that no single note states outright.
-- **🕸️ Live memory graph** — an interactive visualization of exactly what it remembers.
 
 ## Architecture
 
@@ -116,8 +116,6 @@ Cognee is the brain. The local LLM only phrases answers over what Cognee retriev
   feature the hackathon theme is about, and it's verified against a real `kill`.
 - **Swappable core** — every operation goes through the thin `backend/memory.py` wrapper, so the
   entire memory engine sits behind four verbs and could be re-pointed without touching the app.
-
-Everything routes through `backend/memory.py`, so the memory backend is swappable.
 
 ## Quickstart (local, no OpenAI)
 
