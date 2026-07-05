@@ -3,6 +3,8 @@
 > Every new session, your AI assistant forgets why your project is the way it is.
 > **Lore** remembers — the decisions, the trade-offs, and the *why* behind them.
 
+**🎥 3-minute demo:** https://youtu.be/Y0ZuWuzvL68 — every claim below, shown end to end.
+
 Lore is a **persistent, self-hosted memory for a codebase's decisions**. You tell it what you
 decided and why ("we chose Postgres over Mongo because our data is relational"); it uses
 [**Cognee**](https://www.cognee.ai)'s open-source hybrid **graph + vector** memory to build a
@@ -16,6 +18,8 @@ leave — given a memory that never forgets.
 Built for the **WeMakeDevs × Cognee hackathon** ("The Hangover Part AI: Where's My
 Context?"), targeting **Best Use of Open Source**. It runs **100% locally, $0, no API keys** —
 self-hosted Cognee + Ollama.
+
+![The Lore workspace — decisions on the left, natural-language recall on the right, answering from memory that persisted across a previous session.](assets/app.png)
 
 ---
 
@@ -69,6 +73,8 @@ graph-vector memory layer**:
 
 Cognee is the brain. The local LLM only phrases answers over what Cognee retrieves.
 
+![The live memory graph Cognee built from seven short notes — 7 documents, 25 entities, 17 types, 7 summaries, 75 edges — spanning chunks, entities, and their relationships.](assets/graph.png)
+
 ## Features
 
 - **♻️ Cross-session memory** — the headline: decisions persist across restarts, so a new
@@ -90,6 +96,26 @@ Cognee is the brain. The local LLM only phrases answers over what Cognee retriev
                           v               v                v
                     Kuzu graph store   vector store    Ollama (local LLM + embeddings)
 ```
+
+**How a decision flows through the system:**
+
+- **Writing memory — `remember()`** — the browser stages decision notes and posts them to
+  FastAPI, which calls `memory.remember()`. Cognee ingests each note, uses the local Ollama
+  model to extract entities and relationships, and writes them into **both** stores: the Kuzu
+  knowledge graph (nodes + edges) *and* the vector store (embeddings). A marker file under
+  `data/` records that memory now exists on disk.
+- **Reading memory — `recall()`** — a natural-language question goes to `memory.recall()`.
+  Cognee retrieves over the **hybrid** layer: vector search finds semantically relevant chunks,
+  graph traversal follows the relationships between them, and the local LLM phrases a grounded
+  answer over only what was retrieved. The graph is what makes **multi-hop** answers possible —
+  connecting *"mobile can't hold cookies"* to the JWT decision across two separate notes.
+- **Enriching — `improve()`** — cross-links related decisions so later recalls traverse more
+  connections.
+- **Persistence** — Kuzu and the vector store live **on disk**, not in process memory. Kill the
+  server and every byte of context survives; a fresh process reads it straight back. This is the
+  feature the hackathon theme is about, and it's verified against a real `kill`.
+- **Swappable core** — every operation goes through the thin `backend/memory.py` wrapper, so the
+  entire memory engine sits behind four verbs and could be re-pointed without touching the app.
 
 Everything routes through `backend/memory.py`, so the memory backend is swappable.
 
